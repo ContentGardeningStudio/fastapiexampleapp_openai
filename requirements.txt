@@ -46,3 +46,5 @@ uvicorn==0.27.0.post1
 watchfiles==1.0.3
 websockets==14.1
 WTForms==3.1.2
+
+fastapi-limiter==0.1.6

@@ -1,21 +1,12 @@
-from fastapi import FastAPI, HTTPException, Depends, APIRouter
-from app.schemas.openai import TranslationRequest, GrammarCorrectionRequest, ImageGenerationRequest
 import os
-from openai import OpenAI
+
 from dotenv import load_dotenv
-from fastapi_limiter import FastAPILimiter
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi_limiter.depends import RateLimiter
+from openai import OpenAI
 
-import redis.asyncio as redis
-from contextlib import asynccontextmanager
-
-
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    redis_connection = redis.from_url("redis://localhost:6379", encoding="utf8")
-    await FastAPILimiter.init(redis_connection)
-    yield
-    await FastAPILimiter.close()
+from app.schemas.openai import (GrammarCorrectionRequest,
+                                ImageGenerationRequest, TranslationRequest)
 
 load_dotenv()
 
@@ -45,7 +36,7 @@ def translate_text(input_str):
 def grammar_corrector(input_str, language):
     prompt = {
         "en": "You are a grammar checker who correct wrong english text and only return grammarly correct text",
-        "fr": "Tu es un correcteur grammaticale en français qui corrige du texte grammaticalement erroné et qui retourne le texte corrigé"
+        "fr": "Tu es un correcteur grammaticale en français qui corrige du texte grammaticalement erroné et qui retourne le texte corrigé",
     }
 
     completion = client.chat.completions.create(
@@ -73,7 +64,10 @@ def image_generator(input_str):
 
 
 # This line decorates 'translate' as a POST endpoint
-@openai_module.post("/translate/")
+@openai_module.post(
+    "/translate/",
+    # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
+)
 async def translate(request: TranslationRequest):
     try:
         # Call your translation function
@@ -108,4 +102,3 @@ async def translate(request: TranslationRequest):
 #     except Exception as e:
 #         # Handle exceptions or errors during image generation
 #         raise HTTPException(status_code=500, detail=str(e))
-
