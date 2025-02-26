@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from app.api.endpoints.user.user import user_module
 from app.api.endpoints.user.auth import auth_module
-from app.api.endpoints.openai import openai_module
 
 user_router = APIRouter()
 
@@ -16,13 +15,6 @@ user_router.include_router(
     auth_module,
     prefix="",
     tags=["auth"],
-    responses={404: {"description": "Not found"}},
-)
-
-user_router.include_router(
-    openai_module,
-    prefix="",
-    tags=["openai"],
     responses={404: {"description": "Not found"}},
 )
 

@@ -20,14 +20,9 @@ async def lifespan(_: FastAPI):
 load_dotenv()
 
 api_key = os.environ["OPENAI_API_KEY"]
-
-
 # Initialize OpenAI client with your API key
 client = OpenAI()
 
-
-# Initialize FastAPI client
-app = FastAPI(lifespan=lifespan)
 
 openai_module = APIRouter()
 
