@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
+from app.schemas.openai import TranslationRequest, GrammarCorrectionRequest, ImageGenerationRequest
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -29,19 +29,7 @@ client = OpenAI()
 # Initialize FastAPI client
 app = FastAPI(lifespan=lifespan)
 
-
-# Create class with pydantic BaseModel
-class TranslationRequest(BaseModel):
-    input_str: str
-
-
-class GrammarCorrectionRequest(BaseModel):
-    input_str: str
-    language: str
-
-
-class ImageGenerationRequest(BaseModel):
-    input_str: str
+openai_module = APIRouter()
 
 
 def translate_text(input_str):
@@ -90,7 +78,7 @@ def image_generator(input_str):
 
 
 # This line decorates 'translate' as a POST endpoint
-@app.post("/translate/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
+@openai_module.post("/translate/")
 async def translate(request: TranslationRequest):
     try:
         # Call your translation function
@@ -102,27 +90,27 @@ async def translate(request: TranslationRequest):
 
 
 # This line decorates 'grammar_corrector' as a POST endpoint
-@app.post("/correct_grammar/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
-async def correct_grammar(request: GrammarCorrectionRequest):
-    try:
-        # Call your grammar text corrector function
-        corrected_text = grammar_corrector(request.input_str, request.language)
-        return {"corrected_text": corrected_text}
-    except Exception as e:
-        # Handle exceptions or errors during correction
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# This line decorates 'image_generator' as a POST endpoint
-@app.post("/generate_image/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
-async def generate_image(request: ImageGenerationRequest):
-    try:
-        # Call your image generator function
-        image = image_generator(request.input_str)
-
-        # print(image)
-        return {"image": image}
-    except Exception as e:
-        # Handle exceptions or errors during image generation
-        raise HTTPException(status_code=500, detail=str(e))
+# @app.post("/correct_grammar/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
+# async def correct_grammar(request: GrammarCorrectionRequest):
+#     try:
+#         # Call your grammar text corrector function
+#         corrected_text = grammar_corrector(request.input_str, request.language)
+#         return {"corrected_text": corrected_text}
+#     except Exception as e:
+#         # Handle exceptions or errors during correction
+#         raise HTTPException(status_code=500, detail=str(e))
+#
+#
+# # This line decorates 'image_generator' as a POST endpoint
+# @app.post("/generate_image/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
+# async def generate_image(request: ImageGenerationRequest):
+#     try:
+#         # Call your image generator function
+#         image = image_generator(request.input_str)
+#
+#         # print(image)
+#         return {"image": image}
+#     except Exception as e:
+#         # Handle exceptions or errors during image generation
+#         raise HTTPException(status_code=500, detail=str(e))
 
