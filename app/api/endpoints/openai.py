@@ -79,26 +79,32 @@ async def translate(request: TranslationRequest):
 
 
 # This line decorates 'grammar_corrector' as a POST endpoint
-# @app.post("/correct_grammar/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
-# async def correct_grammar(request: GrammarCorrectionRequest):
-#     try:
-#         # Call your grammar text corrector function
-#         corrected_text = grammar_corrector(request.input_str, request.language)
-#         return {"corrected_text": corrected_text}
-#     except Exception as e:
-#         # Handle exceptions or errors during correction
-#         raise HTTPException(status_code=500, detail=str(e))
-#
-#
-# # This line decorates 'image_generator' as a POST endpoint
-# @app.post("/generate_image/", dependencies=[Depends(RateLimiter(times=1, seconds=30))])
-# async def generate_image(request: ImageGenerationRequest):
-#     try:
-#         # Call your image generator function
-#         image = image_generator(request.input_str)
-#
-#         # print(image)
-#         return {"image": image}
-#     except Exception as e:
-#         # Handle exceptions or errors during image generation
-#         raise HTTPException(status_code=500, detail=str(e))
+@openai_module.post(
+    "/correct_grammar/",
+    # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
+)
+async def correct_grammar(request: GrammarCorrectionRequest):
+    try:
+        # Call your grammar text corrector function
+        corrected_text = grammar_corrector(request.input_str, request.language)
+        return {"corrected_text": corrected_text}
+    except Exception as e:
+        # Handle exceptions or errors during correction
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# This line decorates 'image_generator' as a POST endpoint
+@openai_module.post(
+    "/generate_image/",
+    # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
+)
+async def generate_image(request: ImageGenerationRequest):
+    try:
+        # Call your image generator function
+        image = image_generator(request.input_str)
+
+        # print(image)
+        return {"image": image}
+    except Exception as e:
+        # Handle exceptions or errors during image generation
+        raise HTTPException(status_code=500, detail=str(e))
