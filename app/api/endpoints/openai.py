@@ -3,7 +3,11 @@ import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi_limiter.depends import RateLimiter
+from typing import Annotated
 from openai import OpenAI
+
+from app.schemas.user import User
+from app.api.endpoints.user import functions as user_functions
 
 from app.schemas.openai import (GrammarCorrectionRequest,
                                 ImageGenerationRequest, TranslationRequest)
@@ -68,7 +72,12 @@ def image_generator(input_str):
     "/translate/",
     # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
-async def translate(request: TranslationRequest):
+async def translate(request: TranslationRequest, current_user: Annotated[User, Depends(user_functions.get_current_user)]):
+    # print(current_user)
+
+    if current_user is None:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     try:
         # Call your translation function
         translated_text = translate_text(request.input_str)
