@@ -99,7 +99,8 @@ async def correct_grammar(text_to_correct: GrammarCorrectionText):
     try:
         # Call your grammar text corrector function
         corrected_text = grammar_corrector(text_to_correct.text, text_to_correct.language)
-        return {"corrected_text": corrected_text}
+        result = GrammarCorrectionText(text=corrected_text)
+        return result
     except Exception as e:
         # Handle exceptions or errors during correction
         raise HTTPException(status_code=500, detail=str(e))
@@ -116,7 +117,8 @@ async def generate_image(text_creating_image: ImageGenerationText):
         image = image_generator(text_creating_image.text)
 
         # print(image)
-        return {"image": image}
+        result = ImageGenerationText(text=image)
+        return result
     except Exception as e:
         # Handle exceptions or errors during image generation
         raise HTTPException(status_code=500, detail=str(e))
