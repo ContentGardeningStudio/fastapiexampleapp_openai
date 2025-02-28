@@ -72,16 +72,19 @@ def image_generator(input_str):
     "/translate/", response_model=TranslationText
     # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
-async def translate(text_to_translate: TranslationText, current_user: Annotated[User, Depends(user_functions.get_current_user)]):
+async def translate(text_to_translate: TranslationText,
+                    # current_user: Annotated[User, Depends(user_functions.get_current_user)]
+                    ):
     # print(current_user)
 
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+    # if current_user is None:
+    #     raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
         # Call your translation function
         translated_text = translate_text(text_to_translate.text)
-        return {"translated_text": translated_text}
+        result = TranslationText(text=translated_text)
+        return result
     except Exception as e:
         # Handle exceptions or errors during translation
         raise HTTPException(status_code=500, detail=str(e))
