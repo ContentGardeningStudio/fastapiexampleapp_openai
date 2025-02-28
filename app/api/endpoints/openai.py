@@ -9,7 +9,7 @@ from openai import OpenAI
 from app.schemas.user import User
 from app.api.endpoints.user import functions as user_functions
 
-from app.schemas.openai import (GrammarCorrectionText,
+from app.schemas.openai import (GrammarCorrectionText, ImageGenerated,
                                 ImageGenerationText, TranslationText)
 
 load_dotenv()
@@ -108,16 +108,16 @@ async def correct_grammar(text_to_correct: GrammarCorrectionText):
 
 # This line decorates 'image_generator' as a POST endpoint
 @openai_module.post(
-    "/generate_image/", response_model=ImageGenerationText
+    "/generate_image/", response_model=ImageGenerated
     # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
 async def generate_image(text_creating_image: ImageGenerationText):
     try:
         # Call your image generator function
-        image = image_generator(text_creating_image.text)
+        url_image = image_generator(text_creating_image.text)
 
         # print(image)
-        result = ImageGenerationText(text=image)
+        result = ImageGenerated(url=url_image)
         return result
     except Exception as e:
         # Handle exceptions or errors during image generation

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 
 # Create class with pydantic BaseModel
@@ -13,3 +13,7 @@ class GrammarCorrectionText(BaseModel):
 
 class ImageGenerationText(BaseModel):
     text: str
+
+
+class ImageGenerated(BaseModel):
+    url: HttpUrl
