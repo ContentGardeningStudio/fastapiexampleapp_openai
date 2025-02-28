@@ -9,8 +9,8 @@ from openai import OpenAI
 from app.schemas.user import User
 from app.api.endpoints.user import functions as user_functions
 
-from app.schemas.openai import (GrammarCorrectionRequest,
-                                ImageGenerationRequest, TranslationRequest)
+from app.schemas.openai import (GrammarCorrectionText,
+                                ImageGenerationText, TranslationText)
 
 load_dotenv()
 
@@ -69,10 +69,10 @@ def image_generator(input_str):
 
 # This line decorates 'translate' as a POST endpoint
 @openai_module.post(
-    "/translate/",
+    "/translate/", response_model=TranslationText
     # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
-async def translate(request: TranslationRequest, current_user: Annotated[User, Depends(user_functions.get_current_user)]):
+async def translate(text_to_translate: TranslationText, current_user: Annotated[User, Depends(user_functions.get_current_user)]):
     # print(current_user)
 
     if current_user is None:
@@ -80,7 +80,7 @@ async def translate(request: TranslationRequest, current_user: Annotated[User, D
 
     try:
         # Call your translation function
-        translated_text = translate_text(request.input_str)
+        translated_text = translate_text(text_to_translate.text)
         return {"translated_text": translated_text}
     except Exception as e:
         # Handle exceptions or errors during translation
@@ -89,13 +89,13 @@ async def translate(request: TranslationRequest, current_user: Annotated[User, D
 
 # This line decorates 'grammar_corrector' as a POST endpoint
 @openai_module.post(
-    "/correct_grammar/",
+    "/correct_grammar/", response_model=GrammarCorrectionText
     # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
-async def correct_grammar(request: GrammarCorrectionRequest):
+async def correct_grammar(text_to_correct: GrammarCorrectionText):
     try:
         # Call your grammar text corrector function
-        corrected_text = grammar_corrector(request.input_str, request.language)
+        corrected_text = grammar_corrector(text_to_correct.text, text_to_correct.language)
         return {"corrected_text": corrected_text}
     except Exception as e:
         # Handle exceptions or errors during correction
@@ -104,13 +104,13 @@ async def correct_grammar(request: GrammarCorrectionRequest):
 
 # This line decorates 'image_generator' as a POST endpoint
 @openai_module.post(
-    "/generate_image/",
+    "/generate_image/", response_model=ImageGenerationText
     # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
-async def generate_image(request: ImageGenerationRequest):
+async def generate_image(text_creating_image: ImageGenerationText):
     try:
         # Call your image generator function
-        image = image_generator(request.input_str)
+        image = image_generator(text_creating_image.text)
 
         # print(image)
         return {"image": image}

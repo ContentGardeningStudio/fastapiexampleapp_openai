@@ -2,14 +2,14 @@ from pydantic import BaseModel
 
 
 # Create class with pydantic BaseModel
-class TranslationRequest(BaseModel):
-    input_str: str
+class TranslationText(BaseModel):
+    text: str
 
 
-class GrammarCorrectionRequest(BaseModel):
-    input_str: str
+class GrammarCorrectionText(BaseModel):
+    text: str
     language: str
 
 
-class ImageGenerationRequest(BaseModel):
-    input_str: str
+class ImageGenerationText(BaseModel):
+    text: str
