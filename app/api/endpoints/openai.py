@@ -69,22 +69,22 @@ def image_generator(input_str):
 
 # This line decorates 'translate' as a POST endpoint
 @openai_module.post(
-    "/translate/", response_model=TranslationText
-    # dependencies=[Depends(RateLimiter(times=1, seconds=30))]
+    "/translate/", # response_model=TranslationText, dependencies=[Depends(RateLimiter(times=1, seconds=30))]
 )
 async def translate(text_to_translate: TranslationText,
-                    # current_user: Annotated[User, Depends(user_functions.get_current_user)]
+                    current_user: Annotated[User, Depends(user_functions.get_current_user)]
                     ):
     # print(current_user)
 
-    # if current_user is None:
-    #     raise HTTPException(status_code=401, detail="Unauthorized")
+    if current_user is None:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
         # Call your translation function
-        translated_text = translate_text(text_to_translate.text)
-        result = TranslationText(text=translated_text)
-        return result
+        # translated_text = translate_text(text_to_translate.text)
+        translate_text = text_to_translate.text
+        # result = TranslationText(text=translated_text)
+        return {"result": translate_text}
     except Exception as e:
         # Handle exceptions or errors during translation
         raise HTTPException(status_code=500, detail=str(e))
