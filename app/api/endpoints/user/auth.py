@@ -23,6 +23,7 @@ async def login_for_access_token(
     db: Session = Depends(get_db)
 ) -> Token:
     member = user_functions.authenticate_user(db, user=user)
+    print(member)
     if not member:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
