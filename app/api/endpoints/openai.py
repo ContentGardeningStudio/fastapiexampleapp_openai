@@ -24,7 +24,7 @@ openai_module = APIRouter()
 
 def translate_text(input_str):
     completion = client.chat.completions.create(
-        model="gpt-4-0125-preview",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
@@ -44,7 +44,7 @@ def grammar_corrector(input_str, language):
     }
 
     completion = client.chat.completions.create(
-        model="gpt-4-0125-preview",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
@@ -81,10 +81,11 @@ async def translate(text_to_translate: TranslationText,
 
     try:
         # Call your translation function
-        # translated_text = translate_text(text_to_translate.text)
-        translate_text = text_to_translate.text
+        translated_text = translate_text(text_to_translate.text)
+        result = TranslationText(text=translated_text)
+        # translate_text = text_to_translate.text
         # result = TranslationText(text=translated_text)
-        return {"result": translate_text}
+        return {"result": result}
     except Exception as e:
         # Handle exceptions or errors during translation
         raise HTTPException(status_code=500, detail=str(e))
